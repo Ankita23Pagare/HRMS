@@ -1,0 +1,19 @@
+using System;
+
+namespace model_HRMS
+{
+    public class Employee
+    {
+        public string EMPID { get; set; }
+        public string EMPPHONENO { get; set; }
+        public string EMPNAME { get; set; }
+
+        public string EMPSALARY { get; set; }
+
+        public string EMPROLE { get; set; }
+
+        public string EMPADDR { get; set; }
+
+        public string EMPMAIL_ID { get; set; }
+    }
+}

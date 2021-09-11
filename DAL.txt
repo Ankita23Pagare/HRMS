@@ -1,0 +1,322 @@
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Text.RegularExpressions;
+using model_HRMS;
+
+
+namespace DAL1
+{
+    public class DAL
+    {
+        static string constr = "data source=LAPTOP-0SQGU9AN;initial catalog=Assignment;integrated security=True;";
+        public void DisplayHRMS()
+        {
+            DataTable DT = ExecuteData("select * from HRMS");
+            if (DT.Rows.Count > 0)
+            {
+                Console.Write(Environment.NewLine);
+                Console.WriteLine("_____________________________________________________________________________________");
+                Console.WriteLine("                                  DATABASE RECORDS                                   ");
+                Console.WriteLine("_____________________________________________________________________________________");
+                foreach (DataRow row in DT.Rows)
+                {
+                    Console.WriteLine(row["EMPID"].ToString() + "   |  " + row["EMPPHONENO"].ToString() + "   |  " + row["EMPNAME"].ToString() + " |   " + row["EMPSALARY"].ToString() + " | " + row["EMPROLE"].ToString() + " | " + row["EMPADDR"].ToString() + " | " + row["EMPMAIL_ID"].ToString() + " | ");
+                }
+                Console.WriteLine("_____________________________________________________________________________________" + Environment.NewLine);
+            }
+            else
+            {
+                Console.Write(Environment.NewLine);
+                Console.WriteLine("No employee found in database table!!!");
+                Console.Write(Environment.NewLine);
+            }
+        }
+        public DataTable ExecuteData(String Query)
+        {
+            DataTable result = new DataTable();
+
+            try
+            {
+                using (SqlConnection sqlcon = new SqlConnection(constr))
+                {
+                    sqlcon.Open();
+                    SqlCommand cmd = new SqlCommand(Query, sqlcon);
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(result);
+                    sqlcon.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return result;
+        }
+
+
+
+
+                                                   /*INSERT METHOD*/
+
+        public void AddHRMS()
+        {
+            string EMPID = string.Empty;
+            string EMPPHONENO = string.Empty;
+            string EMPNAME = string.Empty;
+            string EMPSALARY = string.Empty;
+            string EMPROLE = string.Empty;
+            string EMPADDR = string.Empty;
+            string EMPMAIL_ID = string.Empty;
+
+            Console.WriteLine("------------------------------WELCOME TO THE HRMS------------------------------------ ");
+            Console.WriteLine("                               INSERT EMPLOYEE                                         ");
+
+            Console.Write("Enter EmpID: ");
+            EMPID = Console.ReadLine();
+
+            //Console.Write("Enter EmpPHONENO: ");
+            //EMPPHONENO = Console.ReadLine();
+
+
+            while (true)
+            {
+                Console.Write(" Enter EmpPHONENO : ");
+                EMPPHONENO = Console.ReadLine();
+                bool Status = isValidMobileNumber(EMPPHONENO);
+                if (Status == true)
+                {
+                    break;
+
+                }
+                else
+                {
+                    Console.WriteLine("********************INVALID PHONE NO PLEASE ENNTER PROPERLY***************************");
+                    continue;
+                }
+            }
+            
+            //Console.Write("Enter EMPNAME: ");
+            //EMPNAME = Console.ReadLine();
+
+            
+
+            while (string.IsNullOrEmpty(EMPNAME))
+            {
+                Console.WriteLine("ENTER EMPNAME : ");
+                EMPNAME = Console.ReadLine();
+                bool status = isValidName(EMPNAME);
+                if (status == true)
+                {
+                    Console.WriteLine("**********************YOU HAVE TO ENTER VALID NAME OF THE NEW EMPLOYEE*********************");
+                    Console.Write("ENTER EMPNAME : ");
+                    EMPNAME = Console.ReadLine();
+                    continue;
+                    
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+
+            Console.Write("Enter EMPSALARY: ");
+            EMPSALARY = Console.ReadLine();
+
+            Console.Write("Enter EMPROLE: ");
+            EMPROLE = Console.ReadLine();
+        
+            Console.Write("Enter EMPADDR: ");
+            EMPADDR = Console.ReadLine();
+
+            //Console.Write("Enter EMPMAIL_ID: ");
+            //EMPMAIL_ID = Console.ReadLine();
+            while (true)
+            {
+                Console.Write(" Enter EMPMAIL_ID : ");
+                EMPMAIL_ID = Console.ReadLine();
+                bool Status = isValidEmail(EMPMAIL_ID);
+                if (Status == true)
+                {
+                    break;
+
+                }
+                else
+                {
+                    Console.WriteLine("************************INVALID EMPMAIL_ID PLEASE ENNTER PROPERLY*********************");
+                    continue;
+                }
+            }
+
+            ExecuteCommand(String.Format("Insert into HRMS(EMPID,EMPPHONENO,EMPNAME,EMPSALARY,EMPROLE,EMPADDR,EMPMAIL_ID) values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}')", EMPID, EMPPHONENO, EMPNAME, EMPSALARY, EMPROLE, EMPADDR, EMPMAIL_ID));
+        }
+        public static bool isValidMobileNumber(string inputMobileNumber)
+        {
+            string strRegex = @"(^[0-9]{10}$)|(^\+[0-9]{2}\s+[0-9]{2}[0-9]{8}$)|(^[0-9]{3}-[0-9]{4}-[0-9]{4}$)";
+
+
+            Regex re = new Regex(strRegex);
+
+
+            if (re.IsMatch(inputMobileNumber))
+
+            {
+                return true;
+
+            }
+
+            else
+            {
+                return (false);
+            }
+
+        }
+        public static bool isValidName(string EMPNAME)
+        { 
+            string strRegex = @"[^A-Za-z0-9]";
+
+            Regex re = new Regex(strRegex, RegexOptions.IgnoreCase);
+
+            if (re.IsMatch(EMPNAME))
+            {
+
+                return (true);
+            }
+            else
+            {
+                return (false);
+            }
+        }
+
+
+        public bool ExecuteCommand(string Queury)
+        {
+            try
+            {
+                using (SqlConnection sqlcon = new SqlConnection(constr))
+                {
+                    sqlcon.Open();
+                    SqlCommand cmd = new SqlCommand(Queury, sqlcon);
+                    cmd.ExecuteNonQuery();
+                    sqlcon.Close();
+
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+                throw;
+            }
+            return true;
+        }
+        public static bool isValidEmail(string inputEmail)
+        {
+            string strRegex = @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z";
+
+            Regex re = new Regex(strRegex, RegexOptions.IgnoreCase);
+
+            if (re.IsMatch(inputEmail))
+                return (true);
+            else
+                return (false);
+        }
+
+
+
+                                                        /*UPDATE METHOD*/
+
+        public void EditHRMS()
+        {
+            string EMPID = string.Empty;
+            string EMPPHONENO = string.Empty;
+            string EMPNAME = string.Empty;
+            string EMPSALARY = string.Empty;
+            string EMPROLE = string.Empty;
+            string EMPADDR = string.Empty;
+            string EMPMAIL_ID = string.Empty;
+
+            Console.WriteLine("------------------------------WELCOME TO THE HRMS------------------------------------ ");
+            Console.WriteLine("                           UPDATE EXISTING EMPLOYEE                                ");
+            Console.WriteLine("                               UPDATE EMPLOYEE                                      ");
+
+            Console.Write("Enter EmpID: ");
+            EMPID = Console.ReadLine();
+
+            Console.Write("Enter EmpPHOENNO: ");
+            EMPPHONENO = Console.ReadLine();
+
+            Console.Write("Enter EMPNAME: ");
+            EMPNAME = Console.ReadLine();
+
+            Console.Write("Enter EMPSALARY: ");
+            EMPSALARY = Console.ReadLine();
+
+            Console.Write("Enter EMPROLE: ");
+            EMPROLE = Console.ReadLine();
+
+            Console.Write("Enter EMPADDR: ");
+            EMPADDR = Console.ReadLine();
+
+            Console.Write("Enter EMPMAIL_ID: ");
+            EMPMAIL_ID = Console.ReadLine();
+
+
+
+            ExecuteCommand(String.Format("Update HRMS set EMPID = '{0}', EMPPHONENO = '{1}', EMPNAME = '{2}' where EMPID = '{0}'", EMPID, EMPPHONENO,EMPNAME));
+
+        }
+
+
+
+
+        /*DELETE METHOD*/
+        public void DeleteHRMS()
+        {
+            string EMPID = string.Empty;
+
+            Console.WriteLine("------------------------------WELCOME TO THE HRMS------------------------------------- ");
+            Console.WriteLine("                                DELETE EXISTING EMPLOYEE                                 ");
+
+            Console.Write("Enter EmpID ");
+            EMPID = Console.ReadLine();
+
+            ExecuteCommand(String.Format("Delete from HRMS where EMPID = '{0}'", EMPID));
+
+            Console.WriteLine("Employee details deleted from the database!" + Environment.NewLine);
+        }
+
+
+
+                                                            /*SEARCH METHOD*/
+        public void SearchHRMS()
+        {
+            Console.WriteLine("------------------------------WELCOME TO THE HRMS------------------------------------ ");
+            Console.WriteLine("ENTER THE EMPLOYEE ID FOR SAERCH THE EPLOYEE DETAILS : ");
+            int EMPID = Convert.ToInt32(Console.ReadLine());
+
+            DataTable DT = ExecuteData(" select * from HRMS where EMPID='" + EMPID + "'");
+            if (DT.Rows.Count>0)
+            {
+                Console.Write(Environment.NewLine);
+                Console.WriteLine("_____________________________________________________________________________________");
+                Console.WriteLine("                                  DATABASE RECORDS                                   ");
+                Console.WriteLine("_____________________________________________________________________________________");
+                foreach (DataRow row in DT.Rows)
+                {
+                    Console.WriteLine(row["EMPID"].ToString() + "     " + row["EMPPHONENO"].ToString() + "     " + row["EMPNAME"].ToString() + " " + row["EMPSALARY"].ToString() + " " + row["EMPROLE"].ToString() + " " + row["EMPADDR"].ToString() + "" + row["EMPMAIL_ID"].ToString());
+                }
+                Console.WriteLine("_____________________________________________________________________________________" + Environment.NewLine);
+            }
+            else
+            {
+                Console.Write(Environment.NewLine);
+                Console.WriteLine("*************************NO EMPLOYEE FOUND IN THE DATABASE***************************");
+                Console.Write(Environment.NewLine);
+            }
+        }
+        }
+    }
+
+
