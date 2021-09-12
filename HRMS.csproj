@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DAL1\DAL1.csproj" />
+    <ProjectReference Include="..\model_HRMS\model_HRMS.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DAL1">
+      <HintPath>..\DAL1\bin\Debug\netcoreapp3.1\DAL1.dll</HintPath>
+    </Reference>
+    <Reference Include="model_HRMS">
+      <HintPath>..\DAL1\bin\Debug\netcoreapp3.1\model_HRMS.dll</HintPath>
+    </Reference>
+    <Reference Include="Validation_HRMS">
+      <HintPath>..\DAL1\bin\Debug\netcoreapp3.1\Validation_HRMS.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
